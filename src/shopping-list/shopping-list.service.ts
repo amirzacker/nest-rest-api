@@ -12,7 +12,6 @@ export class ShoppingListService {
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
   ) {}
-
   async addToList(productId: number, quantity: number): Promise<ShoppingList> {
     const product = await this.productRepository.findOneBy({ id: productId });
     if (!product) {
