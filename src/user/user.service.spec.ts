@@ -2,6 +2,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { User } from './user.entity';
+import { CreateUserDto } from './create-user.dto';
 
 describe('UserService', () => {
   let service: UserService;
@@ -37,7 +38,11 @@ describe('UserService', () => {
 
   describe('createUser', () => {
     it('should successfully insert a user', async () => {
-      const userData = { email: 'Test User', password: '100' };
+      const userData: CreateUserDto = {
+        email: 'Test User',
+        password: '100',
+        fullName: 'Test User',
+      };
 
       // Configurer les mocks pour retourner des valeurs spécifiques
       repository.create.mockReturnValue(userData); // Retourne directement userData pour simuler l'opération de création

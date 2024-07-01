@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { CreateUserDto } from './create-user.dto';
 
 const mockUserService = {
   createUser: jest.fn(),
@@ -38,8 +39,11 @@ describe('UserController', () => {
   // Vous pouvez ajouter plus de tests ici pour vérifier les comportements des méthodes du contrôleur
   describe('createUser', () => {
     it('should call createUser from the UserService', async () => {
-      const UserData = { email: 'Test User', password: '100' };
-
+      const UserData: CreateUserDto = {
+        email: 'Test User',
+        password: '100',
+        fullName: 'Test User',
+      };
       await controller.create(UserData);
 
       expect(mockUserService.createUser).toHaveBeenCalledWith(UserData);
@@ -58,7 +62,7 @@ describe('UserController', () => {
     it('should call findUserById from the UserService', async () => {
       const UserId = '1';
 
-      await controller.findById(UserId);
+      await controller.findOne(UserId);
 
       expect(mockUserService.findUserById).toHaveBeenCalledWith(Number(UserId));
     });
@@ -82,7 +86,7 @@ describe('UserController', () => {
     it('should call deleteUser from the UserService', async () => {
       const UserId = '1';
 
-      await controller.delete(UserId);
+      await controller.remove(UserId);
 
       expect(mockUserService.deleteUser).toHaveBeenCalledWith(Number(UserId));
     });
