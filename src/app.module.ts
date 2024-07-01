@@ -2,14 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductModule } from './product/product.module';
-import { CartModule } from './cart/cart.module';
-import { ShoppingListModule } from './shopping-list/shopping-list.module';
-import { StockModule } from './stock/stock.module';
-import { Product } from './product/product.entity';
-import { Cart } from './cart/cart.entity';
-import { Stock } from './stock/stock.entity';
-import { ShoppingList } from './shopping-list/shoppingList.entity';
+import { UserModule } from './user/user.module';
+import { User } from './user/user.entity';
 
 @Module({
   imports: [
@@ -20,13 +14,10 @@ import { ShoppingList } from './shopping-list/shoppingList.entity';
       username: 'amir',
       password: 'amircentre',
       database: 'shopping_list_db',
-      entities: [Product, Cart, Stock, ShoppingList],
+      entities: [User],
       synchronize: true, // Use only in development!
     }),
-    ProductModule,
-    CartModule,
-    ShoppingListModule,
-    StockModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
