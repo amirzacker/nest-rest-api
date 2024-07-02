@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelWars</title>
+    <style>
+        #canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <div>
+        <input type="color" id="colorPicker" value="#000000">
+        <button id="eraseMode">Mode Effacer</button>
+    </div>
+    <div>
+        <input type="text" id="pseudoInput" placeholder="Entrez votre pseudo">
+        <button id="setPseudo">Définir Pseudo</button>
+    </div>
+    <div id="chatContainer" style="display: none;">
+        <div id="chatMessages" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc;"></div>
+        <input type="text" id="chatInput" placeholder="Entrez votre message">
+        <button id="sendMessage">Envoyer</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+    <script>
+        const socket = io('http://localhost:3000/pixelwars');
+
+        // Ajoutez ceci après la déclaration de socket
+        let pseudo = '';
+        
+        document.getElementById('setPseudo').addEventListener('click', () => {
+            pseudo = document.getElementById('pseudoInput').value;
+            if (pseudo) {
+                socket.emit('setPseudo', pseudo);
+                document.getElementById('chatContainer').style.display = 'block';
+            }
+        });
+    
+        document.getElementById('sendMessage').addEventListener('click', () => {
+            const message = document.getElementById('chatInput').value;
+            if (message && pseudo) {
+                socket.emit('chatMessage', { pseudo, message });
+                document.getElementById('chatInput').value = '';
+            }
+        });
+    
+        socket.on('chatMessage', (data) => {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML += `<p><strong>${data.pseudo}:</strong> ${data.message}</p>`;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+    
+        socket.on('pixelUpdate', (data) => {
+            const { x, y, color } = data;
+            drawPixel(x, y, color);
+        });
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const eraseMode = document.getElementById('eraseMode');
+        let isErasing = false;
+
+
+        socket.onmessage = (event) => {
+            const { x, y, color } = JSON.parse(event.data);
+            drawPixel(x, y, color);
+        };
+
+        function drawPixel(x, y, color) {
+            const pixelSize = 50; // Taille de chaque "pixel" en pixels réels
+            ctx.fillStyle = color;
+            ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+        }
+        canvas.addEventListener('click', (event) => {
+            if (!pseudo) {
+                alert("Veuillez définir un pseudo avant de dessiner.");
+                return;
+            }
+            const rect = canvas.getBoundingClientRect();
+            const pixelSize = 50; // Même taille que dans drawPixel
+            const x = Math.floor((event.clientX - rect.left) / pixelSize);
+            const y = Math.floor((event.clientY - rect.top) / pixelSize);
+            const color = isErasing ? '#FFFFFF' : colorPicker.value;
+
+            socket.emit('pixelUpdate', { x, y, color, pseudo });
+        });
+        eraseMode.addEventListener('click', () => {
+            isErasing = !isErasing;
+            eraseMode.textContent = isErasing ? 'Mode Dessin' : 'Mode Effacer';
+        });
+    </script>
+</body>
+</html>

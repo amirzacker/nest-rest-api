@@ -41,7 +41,7 @@ describe('UserService', () => {
       const userData: CreateUserDto = {
         email: 'Test User',
         password: '100',
-        fullName: 'Test User',
+        username: 'Test User',
       };
 
       // Configurer les mocks pour retourner des valeurs spécifiques

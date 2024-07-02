@@ -4,11 +4,19 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { User } from './user/user.entity';
+import { PixelWarsModule } from './pixelwar/pixelwars.module';
+import { AuthModule } from './auth/auth.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/',
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.HOST_DB || 'localhost',
@@ -17,9 +25,12 @@ import { ConfigModule } from '@nestjs/config';
       password: process.env.PASSWORD_DB || '',
       database: process.env.DB_NAME || 'test',
       entities: [User],
-      synchronize: true, // Use only in development!
+      synchronize: false, // Use only in development!
+      logging: true,
     }),
     UserModule,
+    PixelWarsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

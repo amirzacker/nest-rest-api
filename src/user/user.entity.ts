@@ -11,6 +11,6 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
-  fullName: string;
+  @Column({ unique: true })
+  username: string;
 }
